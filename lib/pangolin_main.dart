@@ -1,9 +1,11 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pangolin/pangolin.dart';
+
+import 'banner_ad_View.dart';
+import 'pangolin.dart';
 
 const int NETWORK_STATE_MOBILE = 1;
 const int NETWORK_STATE_2G = 2;
@@ -52,6 +54,22 @@ Future<bool> loadSplashAd(
     {@required String mCodeId, @required bool debug}) async {
   return await _channel
       .invokeMethod("loadSplashAd", {"mCodeId": mCodeId, "debug": debug});
+}
+
+Widget buildBannerAdView({
+  @required String mCodeId,
+  @required bool debug,
+  int adCount = 1,
+  double width,
+  double height,
+}) {
+  return BannerAdView(
+    mCodeId: mCodeId,
+    debug: debug,
+    adCount: adCount,
+    width: width,
+    height: height,
+  );
 }
 
 Future loadRewardAd({

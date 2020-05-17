@@ -21,20 +21,25 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 
-/** PangolinPlugin */
+/**
+ * PangolinPlugin
+ */
 public class PangolinPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
 
     private MethodChannel methodChannel;
     private Context applicationContext;
-    private Activity activity;
+    private static FlutterPluginBinding pluginBinding;
+    private static  Activity activity;
+    private static Registrar mRegistrar;
 
 
-  @Override
-  public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-      onAttachedToEngine(flutterPluginBinding.getApplicationContext(), flutterPluginBinding.getBinaryMessenger());
-  }
+    @Override
+    public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
+        pluginBinding = flutterPluginBinding;
+        onAttachedToEngine(flutterPluginBinding.getApplicationContext(), flutterPluginBinding.getBinaryMessenger());
+    }
 
-    private void onAttachedToEngine(Context applicationContext , BinaryMessenger messenger) {
+    private void onAttachedToEngine(Context applicationContext, BinaryMessenger messenger) {
         this.applicationContext = applicationContext;
         methodChannel = new MethodChannel(messenger, "com.tongyangsheng.pangolin");
         methodChannel.setMethodCallHandler(this);
@@ -42,7 +47,8 @@ public class PangolinPlugin implements FlutterPlugin, MethodCallHandler, Activit
 
     @Override
     public void onAttachedToActivity(ActivityPluginBinding binding) {
-        this.activity = binding.getActivity();
+        activity = binding.getActivity();
+        setupViews();
     }
 
     @Override
@@ -63,178 +69,133 @@ public class PangolinPlugin implements FlutterPlugin, MethodCallHandler, Activit
     public void onDetachedFromActivity() {
 
     }
-  // This static function is optional and equivalent to onAttachedToEngine. It supports the old
-  // pre-Flutter-1.12 Android projects. You are encouraged to continue supporting
-  // plugin registration via this function while apps migrate to use the new Android APIs
-  // post-flutter-1.12 via https://flutter.dev/go/android-project-migration.
-  //
-  // It is encouraged to share logic between onAttachedToEngine and registerWith to keep
-  // them functionally equivalent. Only one of onAttachedToEngine or registerWith will be called
-  // depending on the user's project. onAttachedToEngine or registerWith must both be defined
-  // in the same class.
-  public static void registerWith(Registrar registrar) {
-    final MethodChannel channel = new MethodChannel(registrar.messenger(), "com.tongyangsheng.pangolin");
-    channel.setMethodCallHandler(new PangolinPlugin());
-  }
 
-  @Override
-  public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-    if (call.method.equals("register")) {
-      String appId = call.argument("appId");
-      Boolean useTextureView = call.argument("useTextureView");
-      String appName = call.argument("appName");
-      Boolean allowShowNotify = call.argument("allowShowNotify");
-      Boolean allowShowPageWhenScreenLock = call.argument("allowShowPageWhenScreenLock");
-      Boolean debug = call.argument("debug");
-      Boolean supportMultiProcess = call.argument("supportMultiProcess");
-      List<Integer> directDownloadNetworkType = call.argument("directDownloadNetworkType");
-      if(useTextureView == null)
-      {
-        useTextureView = false;
-      }
-      if (allowShowNotify == null)
-      {
-        allowShowNotify = true;
-      }
-      if (allowShowPageWhenScreenLock == null)
-      {
-        allowShowPageWhenScreenLock = true;
-      }
-      if (debug == null)
-      {
-        debug = true;
-      }
-      if (supportMultiProcess == null)
-      {
-        supportMultiProcess = false;
-      }
-      if (appId == null || appId.trim().isEmpty())
-      {
-        result.error("500","appId can't be null",null);
-      }
-      else {
-        if (appName == null || appName.trim().isEmpty()) {
-          result.error("600", "appName can't be null", null);
+    // This static function is optional and equivalent to onAttachedToEngine. It supports the old
+    // pre-Flutter-1.12 Android projects. You are encouraged to continue supporting
+    // plugin registration via this function while apps migrate to use the new Android APIs
+    // post-flutter-1.12 via https://flutter.dev/go/android-project-migration.
+    //
+    // It is encouraged to share logic between onAttachedToEngine and registerWith to keep
+    // them functionally equivalent. Only one of onAttachedToEngine or registerWith will be called
+    // depending on the user's project. onAttachedToEngine or registerWith must both be defined
+    // in the same class.
+    public static void registerWith(Registrar registrar) {
+        mRegistrar = registrar;
+        final MethodChannel channel = new MethodChannel(registrar.messenger(), "com.tongyangsheng.pangolin");
+        channel.setMethodCallHandler(new PangolinPlugin());
+        activity = registrar.activity();
+        setupViews(registrar);
+    }
+
+    @Override
+    public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
+        String method = call.method;
+        if (method.equals("register")) {
+            String appId = call.argument("appId");
+            Boolean useTextureView = call.argument("useTextureView");
+            String appName = call.argument("appName");
+            Boolean allowShowNotify = call.argument("allowShowNotify");
+            Boolean allowShowPageWhenScreenLock = call.argument("allowShowPageWhenScreenLock");
+            Boolean debug = call.argument("debug");
+            Boolean supportMultiProcess = call.argument("supportMultiProcess");
+            List<Integer> directDownloadNetworkType = call.argument("directDownloadNetworkType");
+            if (useTextureView == null) {
+                useTextureView = false;
+            }
+            if (allowShowNotify == null) {
+                allowShowNotify = true;
+            }
+            if (allowShowPageWhenScreenLock == null) {
+                allowShowPageWhenScreenLock = true;
+            }
+            if (debug == null) {
+                debug = true;
+            }
+            if (supportMultiProcess == null) {
+                supportMultiProcess = false;
+            }
+            if (appId == null || appId.trim().isEmpty()) {
+                result.error("500", "appId can't be null", null);
+            } else {
+                if (appName == null || appName.trim().isEmpty()) {
+                    result.error("600", "appName can't be null", null);
+                } else {
+                    TTAdManagerHolder.init(applicationContext, appId, useTextureView, appName, allowShowNotify, allowShowPageWhenScreenLock, debug, supportMultiProcess, directDownloadNetworkType);
+                    result.success(true);
+                }
+            }
+        } else if (method.equals("loadSplashAd")) {
+            String mCodeId = call.argument("mCodeId");
+            Boolean deBug = call.argument("debug");
+            Intent intent = new Intent();
+            intent.setClass(activity, SplashActivity.class);
+            intent.putExtra("mCodeId", mCodeId);
+            intent.putExtra("debug", deBug);
+            activity.startActivity(intent);
+        } else if (call.method.equals("loadRewardAd")) {
+            Boolean isHorizontal = call.argument("isHorizontal");
+            String mCodeId = call.argument("mCodeId");
+            Boolean debug = call.argument("debug");
+            Boolean supportDeepLink = call.argument("supportDeepLink");
+            String rewardName = call.argument("rewardName");
+            int rewardAmount = (int) call.argument("rewardAmount");
+            Boolean isExpress = call.argument("isExpress");
+
+            double expressViewAcceptedSizeH;
+            if (call.argument("expressViewAcceptedSizeH") == null) {
+                expressViewAcceptedSizeH = 500;
+            } else {
+                expressViewAcceptedSizeH = call.argument("expressViewAcceptedSizeH");
+            }
+            double expressViewAcceptedSizeW;
+            if (call.argument("expressViewAcceptedSizeW") == null) {
+                expressViewAcceptedSizeW = 500;
+            } else {
+                expressViewAcceptedSizeW = call.argument("expressViewAcceptedSizeW");
+            }
+
+            String userID = call.argument("userID");
+            String mediaExtra;
+            if (call.argument("mediaExtra") == null) {
+                mediaExtra = "media_extra";
+            } else {
+                mediaExtra = call.argument("mediaExtra");
+            }
+
+            RewardVideo rewardVideo = new RewardVideo();
+            RewardVideo._channel = methodChannel;
+            rewardVideo.activity = activity;
+            rewardVideo.context = applicationContext;
+            if (isHorizontal) {
+                rewardVideo.mHorizontalCodeId = mCodeId;
+            } else {
+                rewardVideo.mVerticalCodeId = mCodeId;
+            }
+            rewardVideo.supportDeepLink = supportDeepLink;
+            rewardVideo.expressViewAcceptedSizeH = expressViewAcceptedSizeH;
+            rewardVideo.expressViewAcceptedSizeW = expressViewAcceptedSizeW;
+            rewardVideo.rewardName = rewardName;
+            rewardVideo.rewardAmount = rewardAmount;
+            rewardVideo.userID = userID;
+            rewardVideo.mediaExtra = mediaExtra;
+            rewardVideo.init();
         } else {
-          TTAdManagerHolder.init(applicationContext, appId, useTextureView, appName, allowShowNotify, allowShowPageWhenScreenLock, debug, supportMultiProcess,directDownloadNetworkType);
-          result.success(true);
+            result.notImplemented();
         }
-      }
     }
-    else if(call.method.equals("loadSplashAd"))
-    {
-      String mCodeId = call.argument("mCodeId");
-      Boolean deBug = call.argument("debug");
-      Intent intent = new Intent();
-      intent.setClass(activity,SplashActivity.class);
-      intent.putExtra("mCodeId",mCodeId);
-      intent.putExtra("debug",deBug);
-      activity.startActivity(intent);
+
+
+    private static void setupViews() {
+
+        //注册banner广告
+        BannerViewFactory bannerViewFactory = new BannerViewFactory(activity, pluginBinding.getBinaryMessenger());
+        pluginBinding.getPlatformViewRegistry().registerViewFactory("plugins.pangolin.ads/bannerview", bannerViewFactory);
+
     }
-    else if (call.method.equals("loadRewardAd"))
-    {
-      Boolean isHorizontal = call.argument("isHorizontal");
-      String mCodeId = call.argument("mCodeId");
-      Boolean debug = call.argument("debug");
-      Boolean supportDeepLink = call.argument("supportDeepLink");
-      String rewardName = call.argument("rewardName");
-      int rewardAmount = (int)call.argument("rewardAmount");
-      Boolean isExpress = call.argument("isExpress");
 
-      double expressViewAcceptedSizeH;
-      if (call.argument("expressViewAcceptedSizeH") == null)
-      {
-        expressViewAcceptedSizeH = 500;
-      }
-      else
-      {
-        expressViewAcceptedSizeH = call.argument("expressViewAcceptedSizeH");
-      }
-      double expressViewAcceptedSizeW;
-      if (call.argument("expressViewAcceptedSizeW") == null)
-      {
-        expressViewAcceptedSizeW = 500;
-      }
-      else
-      {
-        expressViewAcceptedSizeW = call.argument("expressViewAcceptedSizeW");
-      }
-
-      String userID = call.argument("userID");
-      String mediaExtra;
-      if (call.argument("mediaExtra") == null)
-      {
-        mediaExtra = "media_extra";
-      }
-      else
-      {
-        mediaExtra = call.argument("mediaExtra");
-      }
-
-      RewardVideo rewardVideo = new RewardVideo();
-      RewardVideo._channel = methodChannel;
-      rewardVideo.activity = activity;
-      rewardVideo.context = applicationContext;
-      if (isHorizontal)
-      {
-        rewardVideo.mHorizontalCodeId = mCodeId;
-      }
-      else
-      {
-        rewardVideo.mVerticalCodeId = mCodeId;
-      }
-      rewardVideo.supportDeepLink = supportDeepLink;
-      rewardVideo.expressViewAcceptedSizeH = expressViewAcceptedSizeH;
-      rewardVideo.expressViewAcceptedSizeW = expressViewAcceptedSizeW;
-      rewardVideo.rewardName = rewardName;
-      rewardVideo.rewardAmount = rewardAmount;
-      rewardVideo.userID = userID;
-      rewardVideo.mediaExtra = mediaExtra;
-      rewardVideo.init();
-
-//      if (isHorizontal == null)
-//      {
-//        result.error("600","isHorizonal can not be null",null);
-//      }
-//      else
-//      {
-//        RewardVideoActivity._channel = methodChannel;
-//        if(isHorizontal)
-//        {
-//          Intent intent = new Intent();
-//          intent.setClass(activity, RewardVideoActivity.class);
-//          intent.putExtra("horizontal_rit",mCodeId);
-//          intent.putExtra("debug",debug);
-//          intent.putExtra("supportDeepLink", supportDeepLink);
-//          intent.putExtra("rewardName",rewardName);
-//          intent.putExtra("rewardAmount",rewardAmount);
-//          intent.putExtra("isExpress",isExpress);
-//          intent.putExtra("expressViewAcceptedSizeH",expressViewAcceptedSizeH);
-//          intent.putExtra("expressViewAcceptedSizeW",expressViewAcceptedSizeW);
-//          intent.putExtra("userID",userID);
-//          intent.putExtra("mediaExtra",mediaExtra);
-//          activity.startActivity(intent);
-//        }
-//        else
-//        {
-//          Intent intent = new Intent();
-//          intent.setClass(activity, RewardVideoActivity.class);
-//          intent.putExtra("vertical_rit",mCodeId);
-//          intent.putExtra("debug",debug);
-//          intent.putExtra("supportDeepLink", supportDeepLink);
-//          intent.putExtra("rewardName",rewardName);
-//          intent.putExtra("rewardAmount",rewardAmount);
-//          intent.putExtra("expressViewAcceptedSizeH",expressViewAcceptedSizeH);
-//          intent.putExtra("expressViewAcceptedSizeW",expressViewAcceptedSizeW);
-//          intent.putExtra("userID",userID);
-//          intent.putExtra("mediaExtra",mediaExtra);
-//          activity.startActivity(intent);
-//        }
-//      }
+    private static void setupViews(Registrar registrar) {
+        //注册banner广告
+        BannerViewFactory bannerViewFactory = new BannerViewFactory(registrar.activity(), registrar.messenger());
+        registrar.platformViewRegistry().registerViewFactory("plugins.pangolin.ads/bannerview", bannerViewFactory);
     }
-    else
-      {
-      result.notImplemented();
-    }
-  }
 }
