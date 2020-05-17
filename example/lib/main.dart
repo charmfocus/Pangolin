@@ -111,11 +111,12 @@ class _MyAppState extends State<MyApp> {
               ),
             ),
             if (initialized)
-              Pangolin.BannerAdView(
-                mCodeId: '945174173',
+              Pangolin.SplashAdView(
+                mCodeId: '887323415',
                 debug: false,
-                height: 100,
-                width: 0,
+                asdIsFinish: () {
+                  print('finished!!!');
+                },
               ),
           ],
         ),

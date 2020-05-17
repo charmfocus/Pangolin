@@ -124,14 +124,6 @@ public class PangolinPlugin implements FlutterPlugin, MethodCallHandler, Activit
                     result.success(true);
                 }
             }
-        } else if (method.equals("loadSplashAd")) {
-            String mCodeId = call.argument("mCodeId");
-            Boolean deBug = call.argument("debug");
-            Intent intent = new Intent();
-            intent.setClass(activity, SplashActivity.class);
-            intent.putExtra("mCodeId", mCodeId);
-            intent.putExtra("debug", deBug);
-            activity.startActivity(intent);
         } else if (call.method.equals("loadRewardAd")) {
             Boolean isHorizontal = call.argument("isHorizontal");
             String mCodeId = call.argument("mCodeId");
@@ -184,8 +176,11 @@ public class PangolinPlugin implements FlutterPlugin, MethodCallHandler, Activit
         }
     }
 
-
     private static void setupViews() {
+
+        //注册开屏广告UI插件
+        SplashViewFactory factory = new SplashViewFactory(activity, pluginBinding.getBinaryMessenger());
+        pluginBinding.getPlatformViewRegistry().registerViewFactory("plugins.pangolin.ads/splashview", factory);
 
         //注册banner广告
         BannerViewFactory bannerViewFactory = new BannerViewFactory(activity, pluginBinding.getBinaryMessenger());
@@ -194,6 +189,11 @@ public class PangolinPlugin implements FlutterPlugin, MethodCallHandler, Activit
     }
 
     private static void setupViews(Registrar registrar) {
+
+        //注册开屏广告UI插件
+        SplashViewFactory factory = new SplashViewFactory(registrar.activity(), registrar.messenger());
+        registrar.platformViewRegistry().registerViewFactory("plugins.pangolin.ads/splashview", factory);
+
         //注册banner广告
         BannerViewFactory bannerViewFactory = new BannerViewFactory(registrar.activity(), registrar.messenger());
         registrar.platformViewRegistry().registerViewFactory("plugins.pangolin.ads/bannerview", bannerViewFactory);

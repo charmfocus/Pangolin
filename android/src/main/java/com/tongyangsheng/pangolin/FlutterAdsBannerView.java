@@ -34,19 +34,14 @@ public class FlutterAdsBannerView implements PlatformView, MethodChannel.MethodC
     private TTAdNative mTTAdNative;
     private TTNativeExpressAd mTTAd;
 
-    public String mCodeId = null;
-    public int adCount = 1;
-    public Boolean supportDeepLink = true;
-    public float expressViewWidth = 500;
-    public float expressViewHeight = 500;
-
-    private boolean debug = true;
     private long startTime = 0;
     private boolean mHasShowDownloadActive = false;
     public Context mContext;
+    private Activity mActivity;
 
 
     public FlutterAdsBannerView(Activity activity, Context context, BinaryMessenger messenger, int id) {
+        mActivity = activity;
         mContext = context;
         MethodChannel methodChannel = new MethodChannel(messenger, "banner_" + id);
         methodChannel.setMethodCallHandler(this);
@@ -56,22 +51,15 @@ public class FlutterAdsBannerView implements PlatformView, MethodChannel.MethodC
                 new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         rootView.setLayoutParams(layoutParams);
         rootView.setBackgroundColor(Color.WHITE);
-//        LinearLayout flAd = new LinearLayout(context);
-//        LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-//        flAd.setLayoutParams(linearLayoutParams);
-//        rootView.addView(flAd);
         TTAdManager ttAdManager = TTAdManagerHolder.get();
 
         mTTAdNative = ttAdManager.createAdNative(context);
-//        loadAd();
-//        mTTAdNative.loadBannerExpressAd();
-//        ADTool.getADTool().getManager().getNativeWrapper().loadBannerView(context, rootView);
     }
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
         switch (call.method) {
-            case "setBannerId":
+            case "setId":
                 loadAd(call, result);
                 break;
             default:
@@ -101,7 +89,7 @@ public class FlutterAdsBannerView implements PlatformView, MethodChannel.MethodC
                 .setCodeId(mCodeId) //广告位id
                 .setSupportDeepLink(supportDeepLink)
                 .setAdCount(adCount) //请求广告数量为1到3条
-                .setExpressViewAcceptedSize((float)width, (float)height) //期望个性化模板广告view的size,单位dp
+                .setExpressViewAcceptedSize((float) width, (float) height) //期望个性化模板广告view的size,单位dp
                 .setImageAcceptedSize(640, 320)//这个参数设置即可，不影响个性化模板广告的size
                 .build();
         //加载广告
@@ -132,24 +120,24 @@ public class FlutterAdsBannerView implements PlatformView, MethodChannel.MethodC
         ad.setExpressInteractionListener(new TTNativeExpressAd.ExpressAdInteractionListener() {
             @Override
             public void onAdClicked(View view, int type) {
-                TToast.show(mContext, "广告被点击");
+//                TToast.show(mContext, "广告被点击");
             }
 
             @Override
             public void onAdShow(View view, int type) {
-                TToast.show(mContext, "广告展示");
+//                TToast.show(mContext, "广告展示");
             }
 
             @Override
             public void onRenderFail(View view, String msg, int code) {
                 Log.e("ExpressView", "render fail:" + (System.currentTimeMillis() - startTime));
-                TToast.show(mContext, msg + " code:" + code);
+//                TToast.show(mContext, msg + " code:" + code);
             }
 
             @Override
             public void onRenderSuccess(View view, float width, float height) {
                 //返回view的宽高 单位 dp
-                TToast.show(mContext, "渲染成功");
+//                TToast.show(mContext, "渲染成功");
                 //在渲染成功回调时展示广告，提升体验
                 rootView.removeAllViews();
                 rootView.addView(view);
@@ -164,35 +152,35 @@ public class FlutterAdsBannerView implements PlatformView, MethodChannel.MethodC
         ad.setDownloadListener(new TTAppDownloadListener() {
             @Override
             public void onIdle() {
-                TToast.show(mContext, "点击开始下载", Toast.LENGTH_LONG);
+//                TToast.show(mContext, "点击开始下载", Toast.LENGTH_LONG);
             }
 
             @Override
             public void onDownloadActive(long totalBytes, long currBytes, String fileName, String appName) {
                 if (!mHasShowDownloadActive) {
                     mHasShowDownloadActive = true;
-                    TToast.show(mContext, "下载中，点击暂停", Toast.LENGTH_LONG);
+//                    TToast.show(mContext, "下载中，点击暂停", Toast.LENGTH_LONG);
                 }
             }
 
             @Override
             public void onDownloadPaused(long totalBytes, long currBytes, String fileName, String appName) {
-                TToast.show(mContext, "下载暂停，点击继续", Toast.LENGTH_LONG);
+//                TToast.show(mContext, "下载暂停，点击继续", Toast.LENGTH_LONG);
             }
 
             @Override
             public void onDownloadFailed(long totalBytes, long currBytes, String fileName, String appName) {
-                TToast.show(mContext, "下载失败，点击重新下载", Toast.LENGTH_LONG);
+//                TToast.show(mContext, "下载失败，点击重新下载", Toast.LENGTH_LONG);
             }
 
             @Override
             public void onInstalled(String fileName, String appName) {
-                TToast.show(mContext, "安装完成，点击图片打开", Toast.LENGTH_LONG);
+//                TToast.show(mContext, "安装完成，点击图片打开", Toast.LENGTH_LONG);
             }
 
             @Override
             public void onDownloadFinished(long totalBytes, String fileName, String appName) {
-                TToast.show(mContext, "点击安装", Toast.LENGTH_LONG);
+//                TToast.show(mContext, "点击安装", Toast.LENGTH_LONG);
             }
         });
     }

@@ -2,11 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-typedef AdsIsFinish = void Function();
-
-typedef AdsIsFailure = void Function();
-
-typedef AdsTick = void Function(num);
+import 'define.dart';
 
 class BannerAdView extends StatefulWidget {
   final AdsIsFinish asdIsFinish;
@@ -44,7 +40,7 @@ class BannerAdView extends StatefulWidget {
 class _BannerAdViewState extends State<BannerAdView> {
   static const BasicMessageChannel<dynamic> messageChannel =
       const BasicMessageChannel(
-          'plugins.nova.ads.event/bannerview', StringCodec());
+          'plugins.pangolin.ads.event/bannerview', StringCodec());
   Size size;
 
   @override
@@ -79,7 +75,7 @@ class _BannerAdViewState extends State<BannerAdView> {
         child: AndroidView(
           viewType: 'plugins.pangolin.ads/bannerview',
           onPlatformViewCreated: (id) {
-            MethodChannel('banner_$id').invokeMethod('setBannerId', {
+            MethodChannel('banner_$id').invokeMethod('setId', {
               'mCodeId': widget.mCodeId,
               'supportDeepLink': widget.supportDeepLink,
               'width': width,
