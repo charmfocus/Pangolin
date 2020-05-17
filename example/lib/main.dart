@@ -71,9 +71,9 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  _loadSplashAd() async {
-    Pangolin.loadSplashAd(mCodeId: "887323415", debug: false);
-  }
+//  _loadSplashAd() async {
+//    Pangolin.loadSplashAd(mCodeId: "887323415", debug: false);
+//  }
 
 //  _loadBannerExpressAd() async {
 //    Pangolin.loadBannerExpressAd(mCodeId: "945174173", debug: false);

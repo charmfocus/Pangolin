@@ -50,12 +50,6 @@ Future<bool> registerPangolin({
   });
 }
 
-Future<bool> loadSplashAd(
-    {@required String mCodeId, @required bool debug}) async {
-  return await _channel
-      .invokeMethod("loadSplashAd", {"mCodeId": mCodeId, "debug": debug});
-}
-
 Widget buildBannerAdView({
   @required String mCodeId,
   @required bool debug,
