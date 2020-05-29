@@ -126,7 +126,7 @@ public class FlutterAdsSplashView implements PlatformView, MethodChannel.MethodC
             @MainThread
             public void onError(int code, String message) {
                 Log.d(TAG, String.valueOf(message));
-                TToast.show(mContext, message);
+//                TToast.show(mContext, message);
                 send("failure");
             }
 

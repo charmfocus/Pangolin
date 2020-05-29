@@ -8,6 +8,7 @@ class SplashAdView extends StatefulWidget {
   final AdsIsFinish asdIsFinish;
   final AdsTick adsTick;
   final AdsIsFailure adsFailure;
+  final AdsIsTimeout adsTimeout;
   final String appId;
   final String mCodeId;
   final int adCount;
@@ -22,6 +23,7 @@ class SplashAdView extends StatefulWidget {
     this.asdIsFinish,
     this.adsTick,
     this.adsFailure,
+    this.adsTimeout,
     this.appId,
     this.mCodeId,
     this.adCount = 1,
@@ -53,6 +55,8 @@ class _SplashAdViewState extends State<SplashAdView> {
           this.widget.asdIsFinish();
         } else if (value == "failure") {
           this.widget.adsFailure();
+        } else if (value == "timeout") {
+          this.widget.adsTimeout();
         }
       }
     });
