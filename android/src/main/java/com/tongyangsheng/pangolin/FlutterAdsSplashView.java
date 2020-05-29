@@ -127,12 +127,14 @@ public class FlutterAdsSplashView implements PlatformView, MethodChannel.MethodC
             public void onError(int code, String message) {
                 Log.d(TAG, String.valueOf(message));
                 TToast.show(mContext, message);
+                send("failure");
             }
 
             @Override
             @MainThread
             public void onTimeout() {
-                TToast.show(mContext, "开屏广告加载超时");
+//                TToast.show(mContext, "开屏广告加载超时");
+                send("timeout");
             }
 
             @Override
