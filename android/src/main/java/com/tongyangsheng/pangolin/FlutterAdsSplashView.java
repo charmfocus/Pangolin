@@ -135,6 +135,7 @@ public class FlutterAdsSplashView implements PlatformView, MethodChannel.MethodC
             public void onTimeout() {
 //                TToast.show(mContext, "开屏广告加载超时");
                 send("timeout");
+                send("failure");
             }
 
             @Override
