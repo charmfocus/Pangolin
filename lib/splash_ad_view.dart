@@ -16,6 +16,7 @@ class SplashAdView extends StatefulWidget {
   final bool isExpress;
   final double width;
   final double height;
+  final int timeout;
   final bool supportDeepLink;
 
   const SplashAdView({
@@ -31,6 +32,7 @@ class SplashAdView extends StatefulWidget {
     this.isExpress = false,
     this.width = 0,
     this.height = 0,
+    this.timeout = 3000,
     this.supportDeepLink = true,
   }) : super(key: key);
 
@@ -83,6 +85,7 @@ class _SplashAdViewState extends State<SplashAdView> {
             'supportDeepLink': widget.supportDeepLink ?? true,
             'width': widget.width,
             'height': widget.height,
+            'timeout': widget.timeout,
           });
         },
       );

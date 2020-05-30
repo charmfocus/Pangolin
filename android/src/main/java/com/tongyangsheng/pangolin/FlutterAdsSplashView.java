@@ -95,6 +95,7 @@ public class FlutterAdsSplashView implements PlatformView, MethodChannel.MethodC
         Boolean isExpress = call.argument("isExpress");
         double width = call.argument("width");
         double height = call.argument("height");
+        int timeout = call.argument("timeout");
 
         //step3:创建开屏广告请求参数AdSlot,具体参数含义参考文档
         AdSlot adSlot = null;
@@ -228,7 +229,7 @@ public class FlutterAdsSplashView implements PlatformView, MethodChannel.MethodC
                     });
                 }
             }
-        }, AD_TIME_OUT);
+        }, timeout>0 ? timeout : AD_TIME_OUT);
 
     }
 
