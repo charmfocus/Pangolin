@@ -66,6 +66,22 @@ Widget buildBannerAdView({
   );
 }
 
+Widget buildNativeAdView({
+  @required String mCodeId,
+  @required bool debug,
+  int adCount = 1,
+  double width,
+  double height,
+}) {
+  return NativeAdView(
+    mCodeId: mCodeId,
+    debug: debug,
+    adCount: adCount,
+    width: width,
+    height: height,
+  );
+}
+
 Future loadRewardAd({
   @required String mCodeId,
   @required bool debug,
