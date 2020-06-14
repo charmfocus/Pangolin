@@ -187,7 +187,7 @@ public class PangolinPlugin implements FlutterPlugin, MethodCallHandler, Activit
         pluginBinding.getPlatformViewRegistry().registerViewFactory("plugins.pangolin.ads/bannerview", bannerViewFactory);
 
         //注册native广告
-        BannerViewFactory nativeViewFactory = new BannerViewFactory(activity, pluginBinding.getBinaryMessenger());
+        NativeViewFactory nativeViewFactory = new NativeViewFactory(activity, pluginBinding.getBinaryMessenger());
         pluginBinding.getPlatformViewRegistry().registerViewFactory("plugins.pangolin.ads/nativeview", nativeViewFactory);
 
     }
@@ -202,7 +202,7 @@ public class PangolinPlugin implements FlutterPlugin, MethodCallHandler, Activit
         BannerViewFactory bannerViewFactory = new BannerViewFactory(registrar.activity(), registrar.messenger());
         registrar.platformViewRegistry().registerViewFactory("plugins.pangolin.ads/bannerview", bannerViewFactory);
         //注册native广告
-        BannerViewFactory nativeViewFactory = new BannerViewFactory(registrar.activity(), registrar.messenger());
+        NativeViewFactory nativeViewFactory = new NativeViewFactory(registrar.activity(), registrar.messenger());
         registrar.platformViewRegistry().registerViewFactory("plugins.pangolin.ads/nativeview", nativeViewFactory);
     }
 }
